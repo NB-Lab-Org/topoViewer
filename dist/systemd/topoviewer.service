@@ -1,0 +1,20 @@
+[Unit]
+Description=TopoViewer - Network Topology Visualization
+After=network.target docker.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/topoviewer
+EnvironmentFile=/opt/topoviewer/config/current-topology.env
+ExecStart=/opt/topoviewer/topoviewer clab \
+    --deployment-type colocated \
+    --allowed-hostnames ${ALLOWED_HOSTNAMES:-localhost} \
+    --server-port 8080 \
+    --clab-user root \
+    --topology-file-yaml ${TOPOLOGY_PATH} \
+    --workdir /opt/topoviewer
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

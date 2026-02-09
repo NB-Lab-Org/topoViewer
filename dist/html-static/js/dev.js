@@ -694,13 +694,20 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
             layout.run();
 
-            // remove node topoviewer
+            // remove node topoviewer - first orphan children, then remove parent
             topoViewerNode = cy.filter('node[name = "topoviewer"]');
-            topoViewerNode.remove();
+            if (topoViewerNode.length > 0) {
+                // Move all children out of parent before removing
+                topoViewerNode.children().move({ parent: null });
+                topoViewerNode.remove();
+            }
 
             // remove node TopoViewerParentNode
             topoViewerParentNode = cy.filter('node[name = "TopoViewer:1"]');
-            topoViewerParentNode.remove();
+            if (topoViewerParentNode.length > 0) {
+                topoViewerParentNode.children().move({ parent: null });
+                topoViewerParentNode.remove();
+            }
 
             var cyExpandCollapse = cy.expandCollapse({
                 layoutBy: null, // null means use existing layout
