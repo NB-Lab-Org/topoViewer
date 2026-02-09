@@ -5,7 +5,7 @@
 : ${VERIFY_CHECKSUM:="false"}
 : ${BIN_INSTALL_DIR:="/usr/bin"}
 
-: ${REPO_NAME:="asadarafat/topoViewer"}
+: ${REPO_NAME:="NB-Lab-Org/topoViewer"}
 : ${REPO_URL:="https://github.com/$REPO_NAME"}
 
 # export http_proxy=http://135.245.192.7:8000 && export https_proxy=http://135.245.192.7:8000
@@ -176,7 +176,7 @@ echo "The detected OS is: $OS_ID"
 getFiles(){
     runAsRoot
     sudo rm -f /tmp/topoviewer.zip*
-    sudo wget -O /tmp/topoviewer.zip https://github.com/asadarafat/topoViewer/raw/development/dist/dist.zip
+    sudo wget -O /tmp/topoviewer.zip https://github.com/NB-Lab-Org/topoViewer/raw/development/dist/dist.zip
     # sudo cp /home/aarafat/topoViewer/dist/dist.zip  /tmp/topoviewer.zip
     # sudo curl -o /tmp/topoviewer.zip  https://github.com/asadarafat/topoViewer/blob/development/dist/dist.zip
     sudo rm -fR /opt/topoviewer
@@ -193,6 +193,13 @@ installFile() {
     cp -rR "$TEMP_DIR"/dist/* /opt/topoviewer/
     sudo rm -r "$TEMP_DIR"
     ln -sf /opt/topoviewer/topoviewer /usr/bin/topoviewer
+
+    # Run install script to set up systemd service and switch script
+    if [ -f /opt/topoviewer/install.sh ]; then
+        chmod +x /opt/topoviewer/install.sh
+        /opt/topoviewer/install.sh
+    fi
+
     topoviewer --help
 }
 

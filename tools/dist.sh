@@ -58,7 +58,13 @@ rm -rR dist/html-static/template/archive-nsp
 
 
 echo "Copy Docker entrypoint.sh ..."
-cp tools/entrypoint.sh dist/entrypoint.sh 
+cp tools/entrypoint.sh dist/entrypoint.sh
+
+echo "Copy deploy scripts..."
+mkdir -p dist/bin dist/systemd
+cp deploy/bin/switch-topoviewer.sh dist/bin/
+cp deploy/systemd/topoviewer.service dist/systemd/
+cp deploy/install.sh dist/install.sh
 
 # echo "Zipping dist folder..."
 # zip dist/dist.zip dist/*
