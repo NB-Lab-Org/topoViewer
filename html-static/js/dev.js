@@ -26,7 +26,7 @@ var isVscodeDeployment = Boolean(window.isVscodeDeployment);
 // If window.isVscodeDeployment is undefined:
 // Boolean(undefined) evaluates to false.
 
-var vsCode
+
 
 
 /// VS-CODE BackEnd messaging handler
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 if (isVscodeDeployment) {
     // Acquire the VS Code API handle
-    vsCode = acquireVsCodeApi();
+    const vsCode = acquireVsCodeApi();
 }
 
 
@@ -61,13 +61,13 @@ const pendingRequests = new Map();
 let requestCounter = 0;
 
 /**
- * sendMessageToVscodeEndpointGet(functionName, payload)
+ * backendGet(functionName, payload)
  *
  * Sends a message to the VS Code extension requesting
  * that the specified backend function be invoked with `payload`.
  * Returns a Promise that resolves with the result from the extension.
  */
-function sendMessageToVscodeEndpointGet(functionName, payload) {
+function backendGet(functionName, payload) {
     return new Promise((resolve, reject) => {
         // Create a unique requestId
         const requestId = `req_${Date.now()}_${++requestCounter}`;
@@ -77,10 +77,10 @@ function sendMessageToVscodeEndpointGet(functionName, payload) {
 
         // Send a message to the extension
         vsCode.postMessage({
-            type: 'Get',
+            type: 'backendGet',
             requestId: requestId,
             functionName: functionName,
-            payload: JSON.stringify(payload) // Explicit serialization
+            payload: payload
         });
     });
 }
@@ -110,9 +110,9 @@ window.addEventListener('message', (event) => {
 });
 
 // using backendGt
-async function runMyBackendCall(payloadData) {
+async function runMyBackendCall() {
     try {
-        const response = await sendMessageToVscodeEndpointGet("backendFuncBB", { foo: "bar" });
+        const response = await backendGet("backendFuncBB", { foo: "bar" });
         console.log("############### Success from backend:", response);
     } catch (err) {
         console.error("############### Backend call failed:", err);
@@ -254,7 +254,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (isVscodeDeployment) {
         // aarafat-tag: vs-code
         initUptime();
-        // runMyBackendCall()
+        runMyBackendCall()
     }
 
     // Call the function during initialization
@@ -694,13 +694,20 @@ document.addEventListener("DOMContentLoaded", async function () {
             });
             layout.run();
 
-            // remove node topoviewer
+            // remove node topoviewer - first orphan children, then remove parent
             topoViewerNode = cy.filter('node[name = "topoviewer"]');
-            topoViewerNode.remove();
+            if (topoViewerNode.length > 0) {
+                // Move all children out of parent before removing
+                topoViewerNode.children().move({ parent: null });
+                topoViewerNode.remove();
+            }
 
             // remove node TopoViewerParentNode
             topoViewerParentNode = cy.filter('node[name = "TopoViewer:1"]');
-            topoViewerParentNode.remove();
+            if (topoViewerParentNode.length > 0) {
+                topoViewerParentNode.children().move({ parent: null });
+                topoViewerParentNode.remove();
+            }
 
             var cyExpandCollapse = cy.expandCollapse({
                 layoutBy: null, // null means use existing layout
@@ -1022,9 +1029,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.info("nodeClicked: ", nodeClicked);
         console.info("edgeClicked: ", edgeClicked);
 
-
-
-
         // Remove all Overlayed Panel
         // Get all elements with the class "panel-overlay"
         var panelOverlays = document.getElementsByClassName("panel-overlay");
@@ -1036,12 +1040,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         // This code will be executed when you click on a node
         // You can add logic specific to nodes here
         const clickedEdge = event.target;
-        console.log("clickedEdge:", clickedEdge)
-        console.log("clickedEdge.data:", clickedEdge.data)
-        console.log("clickedEdge.data.source:", clickedEdge.data("source"))
-        console.log("clickedEdge.data.target:", clickedEdge.data("target"))
-
-
         edgeClicked = true;
 
 
@@ -1095,13 +1093,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
         }
-
-
         if (clickedEdge.data("editor") !== "true") {
-
-
-            console.log("clickedEdge.data.source 2nd:", clickedEdge.data("source"))
-            console.log("clickedEdge.data.target 2nd:", clickedEdge.data("target"))
 
             document.getElementById("panel-link").style.display = "none";
             if (document.getElementById("panel-link").style.display === "none") {
@@ -1117,122 +1109,63 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.getElementById("panel-link-endpoint-b-mac-address").textContent = "getting the MAC address"
 
 
+            // setting clabSourceLinkArgsList
+            clabLinkMacArgsList = [`${clickedEdge.data("extraData").clabSourceLongName}`, `${clickedEdge.data("extraData").clabTargetLongName}`]
 
-            let actualLinkMacPair
-            if (isVscodeDeployment) {
-                try {
-                    let clabLinkMacArgsList = {
-                        clabSourceLongName: clickedEdge.data("extraData").clabSourceLongName,
-                        clabTargetLongName: clickedEdge.data("extraData").clabTargetLongName
-                    };
-                    console.log("clabLinkMacArgsList: ", clabLinkMacArgsList)
-                    const response = await sendMessageToVscodeEndpointGet("routerLinkMacaddress", clabLinkMacArgsList);
-                    console.log("############### Success from backend:", response);
-                } catch (err) {
-                    console.error("############### Backend call failed:", err);
-                }
+            // setting MAC address endpoint-a values by getting the data from clab via /clab-link-mac GET API
+            const actualLinkMacPair = await sendRequestToEndpointGetV3("/clab-link-macaddress", clabLinkMacArgsList)
+
+            console.info("actualLinkMacPair: ", actualLinkMacPair)
+
+            // // setting MAC address endpoint-a values by getting the data from clab via /clab/link/${source_container}/${target_container}/mac GET API
+            // const actualLinkMacPair = await sendRequestToEndpointGetV2(`/clab/link/${source_container}/${target_container}/mac-address`, clabLinkMacArgsList=[])
+
+            sourceClabNode = `${clickedEdge.data("extraData").clabSourceLongName}`
+            targetClabNode = `${clickedEdge.data("extraData").clabTargetLongName}`
+            sourceIfName = `${clickedEdge.data("sourceEndpoint")}`
+            targetIfName = `${clickedEdge.data("targetEndpoint")}`
+
+            const getMacAddressesResult = getMacAddresses(actualLinkMacPair["data"], sourceClabNode, targetClabNode, sourceIfName, targetIfName);
+            if (typeof getMacAddressesResult === "object") { // Ensure result is an object
+                console.info("Source If MAC:", getMacAddressesResult.sourceIfMac); // Access sourceIfMac
+                console.info("Target If MAC:", getMacAddressesResult.targetIfMac); // Access targetIfMac
+
+                document.getElementById("panel-link-endpoint-a-mac-address").textContent = getMacAddressesResult.sourceIfMac
+                document.getElementById("panel-link-endpoint-b-mac-address").textContent = getMacAddressesResult.targetIfMac
+
             } else {
-                // setting MAC address endpoint-a values by getting the data from clab via /clab-link-mac GET API
-                clabLinkMacArgsList = [`${clickedEdge.data("extraData").clabSourceLongName}`, `${clickedEdge.data("extraData").clabTargetLongName}`]
-                actualLinkMacPair = await sendRequestToEndpointGetV3("/clab-link-macaddress", clabLinkMacArgsList)
+                console.info(getMacAddressesResult); // Handle error message
+
+                document.getElementById("panel-link-endpoint-a-mac-address").textContent = "Oops, no MAC address here!"
+                document.getElementById("panel-link-endpoint-b-mac-address").textContent = "Oops, no MAC address here!"
+            }
 
 
+            function getMacAddresses(data, sourceClabNode, targetClabNode, sourceIfName, targetIfName) {
+                const result = data.find(item =>
+                    item.sourceClabNode === sourceClabNode &&
+                    item.targetClabNode === targetClabNode &&
+                    item.sourceIfName === sourceIfName &&
+                    item.targetIfName === targetIfName
+                );
 
-                console.info("actualLinkMacPair: ", actualLinkMacPair)
-
-                // // setting MAC address endpoint-a values by getting the data from clab via /clab/link/${source_container}/${target_container}/mac GET API
-                // const actualLinkMacPair = await sendRequestToEndpointGetV2(`/clab/link/${source_container}/${target_container}/mac-address`, clabLinkMacArgsList=[])
-
-                sourceClabNode = `${clickedEdge.data("extraData").clabSourceLongName}`
-                targetClabNode = `${clickedEdge.data("extraData").clabTargetLongName}`
-                sourceIfName = `${clickedEdge.data("sourceEndpoint")}`
-                targetIfName = `${clickedEdge.data("targetEndpoint")}`
-
-                const getMacAddressesResult = getMacAddresses(actualLinkMacPair["data"], sourceClabNode, targetClabNode, sourceIfName, targetIfName);
-                if (typeof getMacAddressesResult === "object") { // Ensure result is an object
-                    console.info("Source If MAC:", getMacAddressesResult.sourceIfMac); // Access sourceIfMac
-                    console.info("Target If MAC:", getMacAddressesResult.targetIfMac); // Access targetIfMac
-
-                    document.getElementById("panel-link-endpoint-a-mac-address").textContent = getMacAddressesResult.sourceIfMac
-                    document.getElementById("panel-link-endpoint-b-mac-address").textContent = getMacAddressesResult.targetIfMac
-
+                if (result) {
+                    return {
+                        sourceIfMac: result.sourceIfMac,
+                        targetIfMac: result.targetIfMac
+                    };
                 } else {
-                    console.info(getMacAddressesResult); // Handle error message
-
-                    document.getElementById("panel-link-endpoint-a-mac-address").textContent = "Oops, no MAC address here!"
-                    document.getElementById("panel-link-endpoint-b-mac-address").textContent = "Oops, no MAC address here!"
-                }
-
-
-                function getMacAddresses(data, sourceClabNode, targetClabNode, sourceIfName, targetIfName) {
-                    const result = data.find(item =>
-                        item.sourceClabNode === sourceClabNode &&
-                        item.targetClabNode === targetClabNode &&
-                        item.sourceIfName === sourceIfName &&
-                        item.targetIfName === targetIfName
-                    );
-
-                    if (result) {
-                        return {
-                            sourceIfMac: result.sourceIfMac,
-                            targetIfMac: result.targetIfMac
-                        };
-                    } else {
-                        return "No matching data found.";
-                    }
+                    return "No matching data found.";
                 }
             }
 
+            // Setting default impairment values for endpoint A
+            let clabSourceLinkArgsList = [
+                clickedEdge.data("extraData").clabSourceLongName,
+                clickedEdge.data("extraData").clabSourcePort
+            ];
 
-            // // Setting default impairment values for endpoint A
-            // let clabSourceLinkArgsList = [
-            //     clickedEdge.data("extraData").clabSourceLongName,
-            //     clickedEdge.data("extraData").clabSourcePort
-            // ];
-
-
-            // let clabSourceLinkImpairmentClabData
-            // if (isVscodeDeployment) {
-            //     try {
-            //         const response = await sendMessageToVscodeEndpointGet("routerLinkImpairment", clabSourceLinkArgsList);
-            //         console.log("############### Success from backend:", response);
-            //     } catch (err) {
-            //         console.error("############### Backend call failed:", err);
-            //     }
-            // } else {
-            //     clabSourceLinkImpairmentClabData = await sendRequestToEndpointGetV3("/clab-link-impairment", clabSourceLinkArgsList);
-            // }
-
-
-            let clabSourceLinkImpairmentClabData
-            if (isVscodeDeployment) {
-                try {
-                    // Setting default impairment values for endpoint A
-                    let clabSourceLinkArgsList = {
-                        clabSourceLongName: clickedEdge.data("extraData").clabSourceLongName,
-                        clabSourcePort: clickedEdge.data("extraData").clabSourcePort
-                    };
-                    console.log("clabSourceLinkArgsList: ", clabSourceLinkArgsList)
-                    const response = await sendMessageToVscodeEndpointGet("handlerLinkImpairment", clabSourceLinkArgsList);
-                    console.log("############### Success from backend:", response);
-                    // clabSourceLinkImpairmentClabData = JSON.stringify(response)
-                    clabSourceLinkImpairmentClabData = (response)
-
-                } catch (err) {
-                    console.error("############### Backend call failed:", err);
-                }
-            } else {
-                // Setting default impairment values for endpoint A
-                let clabSourceLinkArgsList = [
-                    clickedEdge.data("extraData").clabSourceLongName,
-                    clickedEdge.data("extraData").clabSourcePort
-                ];
-                clabSourceLinkImpairmentClabData = await sendRequestToEndpointGetV3("/clab-link-impairment", clabSourceLinkArgsList)
-            }
-
-
-
-
+            let clabSourceLinkImpairmentClabData = await sendRequestToEndpointGetV3("/clab-link-impairment", clabSourceLinkArgsList);
 
             if (clabSourceLinkImpairmentClabData && typeof clabSourceLinkImpairmentClabData === "object" && Object.keys(clabSourceLinkImpairmentClabData).length > 0) {
                 hideLoadingSpinnerGlobal();
