@@ -267,8 +267,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     initViewportDrawerClabEditoCheckboxToggle()
     initViewportDrawerGeoMapCheckboxToggle()
 
-    insertAndColorSvg("nokia-logo", "white")
-
     // Reusable function to initialize a WebSocket connection
     function initializeWebSocket(url, onMessageCallback) {
         const protocol = location.protocol === "https:" ? "wss://" : "ws://";
@@ -3416,42 +3414,6 @@ function initViewportDrawerGeoMapCheckboxToggle() {
     });
 }
 
-/**
- * Dynamically inserts an inline SVG and modifies its color.
- * @param {string} containerId - The ID of the container where the SVG will be added.
- * @param {string} color - The color to apply to the SVG's `fill` attribute.
- */
-function insertAndColorSvg(containerId, color) {
-    const container = document.getElementById(containerId);
-
-    if (!container) {
-        console.error(`Container with ID ${containerId} not found.`);
-        return;
-    }
-
-    // Define the SVG content
-    const svgContent = `
-		<svg width="110" height="25" viewBox="0 0 170 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<path d="M117.514 1.21646L117.514 38.7835H123.148L123.148 1.21646H117.514ZM57.3221 0.57473C46.3463 0.574681 37.8303 8.56332 37.8303 20C37.8303 31.9517 46.3463 39.4255 57.3221 39.4253C68.2979 39.4251 76.8314 31.9517 76.8139 20C76.798 9.16418 68.2979 0.574779 57.3221 0.57473ZM71.1901 20C71.1901 28.4666 64.9812 34.0774 57.3221 34.0774C49.663 34.0774 43.4541 28.4666 43.4541 20C43.4541 11.687 49.663 5.92265 57.3221 5.92265C64.9812 5.92265 71.1901 11.687 71.1901 20ZM0 3.39001e-06V38.7835H5.74992L5.74992 13.1531L35.6298 40V31.9591L0 3.39001e-06ZM81.0513 20L101.961 38.7836H110.345L89.4038 20L110.345 1.21644H101.961L81.0513 20ZM170 38.7835H163.802L159.27 30.4644H138.742L134.209 38.7835H128.011L135.517 24.9176H156.322L145.948 5.64789L149.006 0L149.006 3.76291e-05L149.006 0L170 38.7835Z" fill="#005AFF"/>
-		</svg>
-	`;
-
-    // Parse the SVG string into a DOM element
-    const parser = new DOMParser();
-    const svgElement = parser.parseFromString(svgContent, 'image/svg+xml').documentElement;
-
-    // Modify the fill color of the SVG
-    svgElement.querySelector('path').setAttribute('fill', color);
-
-    // Append the SVG to the container
-    container.innerHTML = '';
-    container.appendChild(svgElement);
-}
-
-// Call the function during initialization
-document.addEventListener('DOMContentLoaded', () => {
-    insertAndColorSvg('nokia-logo', 'white');
-});
 
 
 function avoidEdgeLabelOverlap(cy) {
@@ -4638,6 +4600,28 @@ if (isVscodeDeployment) {
     addSvgIcon("endpoint-a-clipboard", "images/svg-copy.svg", "Clipboard Icon", "before", "20px");
     addSvgIcon("endpoint-b-clipboard", "images/svg-copy.svg", "Clipboard Icon", "before", "20px");
     addSvgIcon("panel-link-action-impairment-B->A", "images/svg-impairment.svg", "Impairment Icon", "before", "15px");
+}
+
+// Management IP modal functions
+function viewportButtonsMgmtIP() {
+    // Extract management IPs from Cytoscape node data
+    var tbody = document.getElementById("mgmt-ip-table-body");
+    tbody.innerHTML = "";
+    cy.nodes().forEach(function (node) {
+        var extraData = node.data("extraData");
+        if (extraData && extraData.mgmtIpv4Addresss) {
+            var row = tbody.insertRow();
+            row.insertCell(0).textContent = node.data("name") || node.data("id");
+            row.insertCell(1).textContent = extraData.kind || "";
+            row.insertCell(2).textContent = extraData.mgmtIpv4Addresss;
+        }
+    });
+
+    document.getElementById("mgmt-ip-modal").classList.add("is-active");
+}
+
+function closePanelMgmtIP() {
+    document.getElementById("mgmt-ip-modal").classList.remove("is-active");
 }
 
 // ASAD

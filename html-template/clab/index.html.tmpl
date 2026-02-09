@@ -32,8 +32,8 @@
 				<p class="subtitle m-0 px-1 py-0   is-6                 has-text-weight-light  has-text-white" id="ClabSubtitle">Topology name: nokia-MAGc-lab ::: Uptime: 10m10s</p>
 			</div>
 			<div class="level-right">
-				<div id="nokia-logo">
-				<img id="nokia-logo-img" src="images/nokia-logo.svg" width="100" hspace="10" vspace="5">
+				<div id="custom-logo">
+				<span style="color: white; font-size: 20px; font-weight: bold; letter-spacing: 2px; padding: 5px 10px;">NB-Lab</span>
 				</div>
 			<div class="level-item">
 				<div class="dropdown is-hoverable is-right">
@@ -47,9 +47,11 @@
 					<a id="about" href="#" onclick="showPanelAbout(event);" class="dropdown-item label has-text-weight-normal is-small py-0">About TopoViewer</a>                      
 					<hr class="dropdown-divider py-0">
 					<a id="getAllEndpointDetail" href="#" onclick="getActualNodesEndpoints(event);" class="dropdown-item label has-text-weight-normal is-small py-0">Action - Retrieve Actual Endpoint Label</a>     
-					<a id="logMessagesDropdownItem" href="#" onclick="showPanelLogMessages(event);" class="dropdown-item label has-text-weight-normal is-small py-0">Action - Log Messages</a>       
+					<a id="logMessagesDropdownItem" href="#" onclick="showPanelLogMessages(event);" class="dropdown-item label has-text-weight-normal is-small py-0">Action - Log Messages</a>
+					<!-- Hidden: TopoViewer Helper App
 					<hr class="dropdown-divider py-0">
-					<a id="clabClientDropdownItem" href="#" onclick="showPanelTopoViewerClient();"        class="dropdown-item label has-text-weight-normal is-small py-0">TopoViewer Helper App</a>                  
+					<a id="clabClientDropdownItem" href="#" onclick="showPanelTopoViewerClient();"        class="dropdown-item label has-text-weight-normal is-small py-0">TopoViewer Helper App</a>
+					-->
 					</div>
 				</div>
 				</div>
@@ -73,47 +75,57 @@
 			<div id="viewport-buttons" class="box p-2 is-flex" style="display: block; height: auto;">
 				<div class="is-flex is-flex-direction-column is-justify-content-space-evenly">
 					<p class="control p-0">
-						<a  id="viewport-zoom-to-fit" href="#" onclick="viewportButtonsZoomToFit(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;">
+						<a  id="viewport-zoom-to-fit" href="#" onclick="viewportButtonsZoomToFit(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Zoom to Fit">
 						<span class="icon is-small">
 						<i class="fas fa-expand"></i> 
 						</span>
 						</a>
 					</p>
 					<p class="control p-0">
-						<a  id="viewport-layout" href="#" onclick="viewportButtonsLayoutAlgo(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;">
+						<a  id="viewport-layout" href="#" onclick="viewportButtonsLayoutAlgo(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Layout Algorithm">
 						<span class="icon is-small">
 						<i class="fas fa-circle-nodes"></i> 
 						</span>
 						</a>
 					</p>
 					<p class="control p-0">
-						<a  id="viewport-topology-overview" href="#" onclick="viewportButtonsTopologyOverview(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;">
+						<a  id="viewport-topology-overview" href="#" onclick="viewportButtonsTopologyOverview(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Search Node">
 						<span class="icon is-small">
 						<i class="fa-solid fa-binoculars"></i>
 						</span>
 						</a>
 					</p>
 					<p class="control p-0">
-						<a  id="viewport-label-endpoint" href="#" onclick="viewportButtonsLabelEndpoint()" class="button px-4 py-4 is-smallest-element" style="outline: none;">
+						<a  id="viewport-label-endpoint" href="#" onclick="viewportButtonsLabelEndpoint()" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Label Endpoint">
 						<span class="icon is-small">
 						<i class="fas fa-tag"></i> 
 						</span>
 						</a>
 					</p>
 					<p class="control p-0">
-						<a  id="viewport-container-status-visibility" href="#" onclick="viewportButtonContainerStatusVisibility()"class="button px-4 py-4 is-smallest-element" style="outline: none;">
+						<a  id="viewport-container-status-visibility" href="#" onclick="viewportButtonContainerStatusVisibility()" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Container Status">
 						<span class="icon is-small">
 						<i class="fab fa-docker"></i> 
 						</span>
 						</a>
 					</p>
 					<p class="control p-0">
-						<a  id="viewport-topology-capture" href="#" onclick="viewportButtonsTopologyCapture(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;">
+						<a id="viewport-mgmt-ip" href="#" onclick="viewportButtonsMgmtIP(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Management IP">
 						<span class="icon is-small">
-						<i class="fas fa-camera"></i> 
+						<i class="fas fa-network-wired"></i>
 						</span>
 						</a>
 					</p>
+					<!-- Hidden: Topology Capture
+					<p class="control p-0">
+						<a  id="viewport-topology-capture" href="#" onclick="viewportButtonsTopologyCapture(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;">
+						<span class="icon is-small">
+						<i class="fas fa-camera"></i>
+						</span>
+						</a>
+					</p>
+					-->
+					<!-- Hidden: Containerlab Editor
 					<p class="control p-0">
 						<a  id="viewport-clab-editor" href="#" onclick="viewportButtonsClabEditor(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;">
 						<span class="icon is-small">
@@ -121,6 +133,8 @@
 						</span>
 						</a>
 					</p>
+					-->
+					<!-- Hidden: Multi-Layer Toggle
 					<p class="control p-0">
 						<a  id="viewport-multi-layer" href="#" onclick="viewportButtonsMultiLayerViewPortToggle(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;">
 						<span class="icon is-small">
@@ -128,6 +142,7 @@
 						</span>
 						</a>
 					</p>
+					-->
 
 					
 					<hr id="viewport-geo-map-divider" class="my-1 viewport-geo-map is-hidden" style="border-top: 1px solid #dbdbdb;">
@@ -1087,7 +1102,31 @@
 				</div>
 			</div>
 
-			
+			<!-- Management IP Modal -->
+			<div class="modal" id="mgmt-ip-modal">
+				<div class="modal-background" onclick="closePanelMgmtIP()"></div>
+				<div class="modal-card" style="max-width: 520px;">
+					<header class="modal-card-head py-2">
+						<p class="modal-card-title is-size-6">Management IP Addresses</p>
+						<button class="delete" aria-label="close" onclick="closePanelMgmtIP()"></button>
+					</header>
+					<section class="modal-card-body p-3">
+						<table class="table is-fullwidth is-hoverable is-size-7" id="mgmt-ip-table">
+							<thead>
+								<tr>
+									<th>Device</th>
+									<th>Platform</th>
+									<th>Management IPv4</th>
+								</tr>
+							</thead>
+							<tbody id="mgmt-ip-table-body">
+							</tbody>
+						</table>
+					</section>
+				</div>
+			</div>
+
+
 			<div class="modal" id="wiresharkModal">
 				<div class="modal-background"></div>
 				<div class="modal-content">
@@ -1165,7 +1204,7 @@
 			
 			
 
-			<script src="js/dev.js?ver=1"></script>
+			<script src="js/dev.js?ver=3"></script>
 			
 			<script src="/js/backupRestore.js?ver=1"></script>
 			<script src="/js/managerClabEditor.js?ver=1"></script>
