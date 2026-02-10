@@ -190,7 +190,7 @@ installFile() {
     runAsRoot
     TEMP_DIR=$(mktemp -d)
     unzip /tmp/topoviewer.zip -d "$TEMP_DIR"
-    cp -rR "$TEMP_DIR"/dist/* /opt/topoviewer/
+    cp -rR "$TEMP_DIR"/* /opt/topoviewer/
     sudo rm -r "$TEMP_DIR"
     ln -sf /opt/topoviewer/topoviewer /usr/bin/topoviewer
 
