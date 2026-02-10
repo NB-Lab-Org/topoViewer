@@ -92,14 +92,12 @@ cmd_switch() {
         exit 1
     fi
 
-    # Check if topology is running in ContainerLab
+    # Warn if topology is not running (TopoViewer can still display the YAML structure)
     if ! topology_is_running "$topo_name"; then
-        echo "❌ Error: Topology is not running: $topo_name"
-        echo "   The topology file exists but ContainerLab has not deployed it."
+        echo "⚠️  Warning: Topology is not running in ContainerLab: $topo_name"
+        echo "   TopoViewer will show the topology structure but terminal access won't work."
+        echo "   To deploy: containerlab deploy -t $topo_path"
         echo ""
-        echo "   Deploy the topology first:"
-        echo "   containerlab deploy -t $topo_path"
-        exit 1
     fi
 
     # Check if already on this topology
