@@ -4624,4 +4624,22 @@ function closePanelMgmtIP() {
     document.getElementById("mgmt-ip-modal").classList.remove("is-active");
 }
 
+function exportMgmtIPsToCSV() {
+    var csv = "Device,Management IPv4\n";
+    var rows = document.querySelectorAll("#mgmt-ip-table-body tr");
+    rows.forEach(function (row) {
+        var cells = row.querySelectorAll("td");
+        var device = cells[0].textContent;
+        var ip = cells[2].textContent;
+        csv += '"' + device + '","' + ip + '"\n';
+    });
+    var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    var link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = (labName || "topology") + "-mgmt-ips.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 // ASAD
