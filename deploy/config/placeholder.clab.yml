@@ -1,0 +1,11 @@
+name: placeholder
+topology:
+  nodes:
+    node1:
+      kind: linux
+      image: alpine:latest
+    node2:
+      kind: linux
+      image: alpine:latest
+  links:
+    - endpoints: ["node1:eth1", "node2:eth1"]

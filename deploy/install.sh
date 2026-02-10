@@ -53,7 +53,7 @@ if [ ! -f "${INSTALL_DIR}/config/current-topology.env" ]; then
 # TopoViewer Configuration
 # TOPOLOGY_PATH: Set by switch-topoviewer.sh or manually
 # ALLOWED_HOSTNAMES: Comma-separated list of hostnames for CORS
-TOPOLOGY_PATH=
+TOPOLOGY_PATH=/opt/topoviewer/config/placeholder.clab.yml
 ALLOWED_HOSTNAMES=localhost
 EOF
     echo "Created initial config at ${INSTALL_DIR}/config/current-topology.env"

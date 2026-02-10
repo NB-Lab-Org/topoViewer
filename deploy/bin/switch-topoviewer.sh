@@ -110,8 +110,12 @@ cmd_switch() {
 
     echo "🔄 Switching to topology: $topo_name"
 
-    # Update environment file
-    echo "TOPOLOGY_PATH=$topo_path" > "$ENV_FILE"
+    # Update TOPOLOGY_PATH in environment file, preserving other settings
+    if [ -f "$ENV_FILE" ] && grep -q "^TOPOLOGY_PATH=" "$ENV_FILE"; then
+        sed -i "s|^TOPOLOGY_PATH=.*|TOPOLOGY_PATH=$topo_path|" "$ENV_FILE"
+    else
+        echo "TOPOLOGY_PATH=$topo_path" >> "$ENV_FILE"
+    fi
 
     # Restart service
     systemctl daemon-reload
