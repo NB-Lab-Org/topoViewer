@@ -27,7 +27,6 @@ The codebase is organized into several folders prefixed with `go_`, each serving
 ### Prerequisites
 
 - Linux (x86_64) with Docker and [ContainerLab](https://containerlab.dev/) installed
-- At least one ContainerLab topology deployed
 - `unzip`, `wget`, `jq` available on the system
 
 ### Quick Install
@@ -41,8 +40,11 @@ bash <(wget -qO- https://raw.githubusercontent.com/NB-Lab-Org/topoViewer/develop
 This will:
 1. Download the latest `dist.zip` from the repository
 2. Extract binary and assets to `/opt/topoviewer/`
-3. Set up the systemd service (`topoviewer.service`)
+3. Set up the systemd service (`topoviewer.service`, enabled but not started)
 4. Create the topology switching script at `/opt/topoviewer/bin/switch-topoviewer.sh`
+5. Create a default config pointing to a built-in placeholder topology
+
+No ContainerLab topology needs to be deployed beforehand — TopoViewer ships with a placeholder topology and can start immediately.
 
 ### Configuration
 
@@ -52,13 +54,12 @@ After installation, edit the config file:
 vi /opt/topoviewer/config/current-topology.env
 ```
 
-Set two values:
-- **TOPOLOGY_PATH**: Path to your ContainerLab topology YAML file
 - **ALLOWED_HOSTNAMES**: Comma-separated list of hostnames for CORS (e.g., `localhost,my.domain.com`)
+- **TOPOLOGY_PATH**: Path to the ContainerLab topology YAML file (defaults to the built-in placeholder)
 
 Example:
 ```
-TOPOLOGY_PATH=/root/containerlab/my-lab/my-lab.clab.yml
+TOPOLOGY_PATH=/opt/topoviewer/config/placeholder.clab.yml
 ALLOWED_HOSTNAMES=localhost,my-topoviewer.example.com
 ```
 
@@ -69,7 +70,53 @@ systemctl start topoviewer
 systemctl status topoviewer
 ```
 
-TopoViewer will be available at `http://<host>:8080`.
+TopoViewer will be available at `http://<host>:8080`. On first start it shows the placeholder topology. Once you deploy a real ContainerLab topology, use the switch script below to point TopoViewer at it.
+
+### Cloudflare Tunnel (Optional)
+
+To expose TopoViewer externally via Cloudflare Tunnel:
+
+1. Install `cloudflared`:
+```bash
+curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | gpg --dearmor -o /usr/share/keyrings/cloudflare-main.gpg
+echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflared.list
+apt update && apt install -y cloudflared
+```
+
+2. Authenticate and create a tunnel:
+```bash
+cloudflared tunnel login
+cloudflared tunnel create topoviewer
+```
+
+3. Configure the tunnel. Create `/etc/cloudflared/config.yml`:
+```yaml
+tunnel: <TUNNEL_ID>
+credentials-file: /root/.cloudflared/<TUNNEL_ID>.json
+
+ingress:
+  - hostname: my-topoviewer.example.com
+    service: http://localhost:8080
+  - service: http_status:404
+```
+
+4. Route DNS:
+```bash
+cloudflared tunnel route dns topoviewer my-topoviewer.example.com
+```
+
+5. Install as a systemd service and start:
+```bash
+cloudflared service install
+systemctl start cloudflared
+```
+
+6. Update TopoViewer's `ALLOWED_HOSTNAMES` to include your domain:
+```bash
+vi /opt/topoviewer/config/current-topology.env
+# Set: ALLOWED_HOSTNAMES=localhost,my-topoviewer.example.com
+systemctl restart topoviewer
+```
 
 ### Switching Topologies
 
