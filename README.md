@@ -22,6 +22,81 @@ The codebase is organized into several folders prefixed with `go_`, each serving
 - **go_tools**: Contains various utility functions and tools essential for TopoViewer’s operations.
 
 
+## Deployment
+
+### Prerequisites
+
+- Linux (x86_64) with Docker and [ContainerLab](https://containerlab.dev/) installed
+- At least one ContainerLab topology deployed
+- `unzip`, `wget`, `jq` available on the system
+
+### Quick Install
+
+Run the install script on the target VM:
+
+```bash
+bash <(wget -qO- https://raw.githubusercontent.com/NB-Lab-Org/topoViewer/development/tools/get.sh)
+```
+
+This will:
+1. Download the latest `dist.zip` from the repository
+2. Extract binary and assets to `/opt/topoviewer/`
+3. Set up the systemd service (`topoviewer.service`)
+4. Create the topology switching script at `/opt/topoviewer/bin/switch-topoviewer.sh`
+
+### Configuration
+
+After installation, edit the config file:
+
+```bash
+vi /opt/topoviewer/config/current-topology.env
+```
+
+Set two values:
+- **TOPOLOGY_PATH**: Path to your ContainerLab topology YAML file
+- **ALLOWED_HOSTNAMES**: Comma-separated list of hostnames for CORS (e.g., `localhost,my.domain.com`)
+
+Example:
+```
+TOPOLOGY_PATH=/root/containerlab/my-lab/my-lab.clab.yml
+ALLOWED_HOSTNAMES=localhost,my-topoviewer.example.com
+```
+
+### Start the Service
+
+```bash
+systemctl start topoviewer
+systemctl status topoviewer
+```
+
+TopoViewer will be available at `http://<host>:8080`.
+
+### Switching Topologies
+
+Use the switch script to change between deployed topologies:
+
+```bash
+# List all topologies
+/opt/topoviewer/bin/switch-topoviewer.sh list
+
+# Switch to a different topology
+/opt/topoviewer/bin/switch-topoviewer.sh switch <topology-name>
+
+# Show current topology
+/opt/topoviewer/bin/switch-topoviewer.sh current
+```
+
+The topology must be deployed in ContainerLab before switching. The expected directory structure is:
+```
+/root/containerlab/<name>/<name>.clab.yml
+```
+
+### Logs
+
+```bash
+journalctl -u topoviewer -f
+```
+
 ## Container Lab Topology Features
 
 TopoViewer provides specialized support for Container Lab topologies, enhancing network visualization and usability. The following guides and features are tailored for Container Lab users:

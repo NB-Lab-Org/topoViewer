@@ -19,22 +19,25 @@ echo "Installing TopoViewer to ${INSTALL_DIR}..."
 # Create directory structure
 mkdir -p "${INSTALL_DIR}"/{bin,config,html-public,logs}
 
-# Copy binary and assets (skip if files don't exist - supports both dist/ and repo layouts)
-for item in topoviewer html-static html-public config html-template; do
-    if [ -e "${SCRIPT_DIR}/../dist/${item}" ]; then
-        cp -r "${SCRIPT_DIR}/../dist/${item}" "${INSTALL_DIR}/"
-    elif [ -e "${SCRIPT_DIR}/${item}" ]; then
-        cp -r "${SCRIPT_DIR}/${item}" "${INSTALL_DIR}/"
-    fi
-done
+# Skip copy if already running from the install directory (e.g., called by get.sh)
+if [ "$(realpath "${SCRIPT_DIR}")" != "$(realpath "${INSTALL_DIR}")" ]; then
+    # Copy binary and assets (supports both dist/ and repo layouts)
+    for item in topoviewer html-static html-public config html-template; do
+        if [ -e "${SCRIPT_DIR}/../dist/${item}" ]; then
+            cp -r "${SCRIPT_DIR}/../dist/${item}" "${INSTALL_DIR}/"
+        elif [ -e "${SCRIPT_DIR}/${item}" ]; then
+            cp -r "${SCRIPT_DIR}/${item}" "${INSTALL_DIR}/"
+        fi
+    done
 
-# Install switch script
-if [ -f "${SCRIPT_DIR}/bin/switch-topoviewer.sh" ]; then
-    cp "${SCRIPT_DIR}/bin/switch-topoviewer.sh" "${INSTALL_DIR}/bin/"
-elif [ -f "${SCRIPT_DIR}/../deploy/bin/switch-topoviewer.sh" ]; then
-    cp "${SCRIPT_DIR}/../deploy/bin/switch-topoviewer.sh" "${INSTALL_DIR}/bin/"
+    # Install switch script
+    if [ -f "${SCRIPT_DIR}/bin/switch-topoviewer.sh" ]; then
+        cp "${SCRIPT_DIR}/bin/switch-topoviewer.sh" "${INSTALL_DIR}/bin/"
+    elif [ -f "${SCRIPT_DIR}/../deploy/bin/switch-topoviewer.sh" ]; then
+        cp "${SCRIPT_DIR}/../deploy/bin/switch-topoviewer.sh" "${INSTALL_DIR}/bin/"
+    fi
 fi
-chmod +x "${INSTALL_DIR}/bin/switch-topoviewer.sh"
+chmod +x "${INSTALL_DIR}/bin/switch-topoviewer.sh" 2>/dev/null || true
 chmod +x "${INSTALL_DIR}/topoviewer" 2>/dev/null || true
 
 # Install systemd service
