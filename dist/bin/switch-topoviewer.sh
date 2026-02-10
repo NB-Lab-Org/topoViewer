@@ -10,8 +10,14 @@
 set -e
 
 # Configuration
-CONTAINERLAB_DIR="/root/containerlab"
 ENV_FILE="/opt/topoviewer/config/current-topology.env"
+
+# Read CONTAINERLAB_DIR from env file, fall back to /opt/containerlab
+if [ -f "$ENV_FILE" ] && grep -q "^CONTAINERLAB_DIR=" "$ENV_FILE"; then
+    CONTAINERLAB_DIR=$(grep "^CONTAINERLAB_DIR=" "$ENV_FILE" | cut -d'=' -f2)
+else
+    CONTAINERLAB_DIR="/opt/containerlab"
+fi
 LOCK_FILE="/tmp/topoviewer-switch.lock"
 SERVICE_NAME="topoviewer"
 

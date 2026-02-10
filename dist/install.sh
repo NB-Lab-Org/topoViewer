@@ -53,8 +53,10 @@ if [ ! -f "${INSTALL_DIR}/config/current-topology.env" ]; then
 # TopoViewer Configuration
 # TOPOLOGY_PATH: Set by switch-topoviewer.sh or manually
 # ALLOWED_HOSTNAMES: Comma-separated list of hostnames for CORS
+# CONTAINERLAB_DIR: ContainerLab topology directory (used by switch-topoviewer.sh)
 TOPOLOGY_PATH=/opt/topoviewer/config/placeholder.clab.yml
 ALLOWED_HOSTNAMES=localhost
+CONTAINERLAB_DIR=/opt/containerlab
 EOF
     echo "Created initial config at ${INSTALL_DIR}/config/current-topology.env"
     echo "  Edit ALLOWED_HOSTNAMES to add your domain (e.g., localhost,my.domain.com)"
