@@ -10,6 +10,8 @@ var globalSelectedEdge
 
 var linkEndpointVisibility = true;
 var nodeContainerStatusVisibility = false;
+var containerStatusReceived = false;
+var topologyHealthState = "checking"; // "checking" | "deployed" | "not-deployed"
 
 var globalShellUrl = "/js/cloudshell"
 
@@ -308,7 +310,14 @@ document.addEventListener("DOMContentLoaded", async function () {
             const string02 = " ::: Uptime: " + msgUptime.data;
 
             const ClabSubtitle = document.getElementById("ClabSubtitle");
-            const messageBody = string01 + string02;
+            var messageBody = string01 + string02;
+            if (topologyHealthState === "checking") {
+                messageBody += " ::: ⏳ Health Checking";
+            } else if (topologyHealthState === "not-deployed") {
+                messageBody += " ::: ⚠️ Not Deployed";
+            } else if (topologyHealthState === "deployed") {
+                messageBody += " ::: ✅ Deployed";
+            }
 
             ClabSubtitle.innerText = messageBody;
             console.info(ClabSubtitle.innerText);
@@ -318,6 +327,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             "/containerNodeStatus",
             (msgContainerNodeStatus) => {
                 try {
+                    containerStatusReceived = true;
+                    if (topologyHealthState === "checking") {
+                        topologyHealthState = "deployed";
+                    }
                     const {
                         Names,
                         Status,
@@ -337,6 +350,25 @@ document.addEventListener("DOMContentLoaded", async function () {
                 }
             },
         );
+
+        // Detect if topology is not deployed (no container status messages received)
+        setTimeout(function () {
+            if (!containerStatusReceived) {
+                topologyHealthState = "not-deployed";
+                bulmaToast.toast({
+                    message: '<span style="margin-right: 25px; display: block;">This topology is not deployed. Topology structure is shown from YAML. Terminal access and container status are unavailable.</span>',
+                    type: "is-warning is-size-6 p-3",
+                    duration: 999999999,
+                    position: "top-center",
+                    dismissible: true,
+                    closeOnClick: false,
+                });
+                var subtitle = document.getElementById("ClabSubtitle");
+                if (subtitle) {
+                    subtitle.innerText = subtitle.innerText.replace(" ::: ⏳ Health Checking", " ::: ⚠️ Not Deployed");
+                }
+            }
+        }, 15000);
     }
 
     // deploymenType vs-code
@@ -4640,6 +4672,24 @@ function exportMgmtIPsToCSV() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+function copyMgmtIPs() {
+    var ips = [];
+    var rows = document.querySelectorAll("#mgmt-ip-table-body tr");
+    rows.forEach(function (row) {
+        var cells = row.querySelectorAll("td");
+        if (cells[2]) ips.push(cells[2].textContent);
+    });
+    navigator.clipboard.writeText(ips.join(",")).then(function () {
+        bulmaToast.toast({
+            message: "Management IPs copied to clipboard",
+            type: "is-success is-size-6 p-3",
+            duration: 3000,
+            position: "top-center",
+            closeOnClick: true,
+        });
+    });
 }
 
 // ASAD
