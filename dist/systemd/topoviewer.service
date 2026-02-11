@@ -8,7 +8,7 @@ WorkingDirectory=/opt/topoviewer
 EnvironmentFile=/opt/topoviewer/config/current-topology.env
 ExecStart=/opt/topoviewer/topoviewer clab \
     --deployment-type colocated \
-    --allowed-hostnames ${ALLOWED_HOSTNAMES:-localhost} \
+    --allowed-hostnames ${ALLOWED_HOSTNAMES} \
     --server-port 8080 \
     --clab-user root \
     --topology-file-yaml ${TOPOLOGY_PATH} \
