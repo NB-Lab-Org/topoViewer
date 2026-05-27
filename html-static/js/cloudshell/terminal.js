@@ -65,10 +65,13 @@
 		setTimeout(function() {
 			fitAddon.fit();
 		});
-		// Uncomment the following lines if needed to send commands to the WebSocket
-		// ws.send("ssh -q -o StrictHostKeyChecking=no admin@" + routerId.toString().split("?")[0]);
-		console.log("ssh -q -o StrictHostKeyChecking=no admin@" + urlParam('RouterName'));
-		ws.send("ssh -q -o StrictHostKeyChecking=no admin@" + urlParam('RouterName'));
+		// Defer ssh until AttachAddon is wired to the WebSocket; otherwise the
+		// server's first 'Password:' prompt arrives before the addon attaches
+		// and the user has to hit Enter to re-trigger it.
+		setTimeout(function() {
+			console.log("ssh -q -o StrictHostKeyChecking=no netbrain@" + urlParam('RouterName'));
+			ws.send("ssh -q -o StrictHostKeyChecking=no netbrain@" + urlParam('RouterName'));
+		}, 100);
 
 
 

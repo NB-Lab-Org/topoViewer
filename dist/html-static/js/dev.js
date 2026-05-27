@@ -2061,7 +2061,7 @@ async function sshCliCommandCopy(event) {
         routerData = findCytoElementByLongname(cytoTopologyJson, routerName)
         clabUser = routerData["data"]["extraData"]["clabServerUsername"]
 
-        sshCopyString = `ssh -t ${clabUser}@${clabServerAddress} "ssh admin@${routerName}"`
+        sshCopyString = `ssh -t ${clabUser}@${clabServerAddress} "ssh netbrain@${routerName}"`
 
         // Check if the clipboard API is available
         if (navigator.clipboard && navigator.clipboard.writeText) {
