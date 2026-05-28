@@ -65,12 +65,9 @@
 		setTimeout(function() {
 			fitAddon.fit();
 		});
-		// Defer ssh until AttachAddon is wired to the WebSocket; otherwise the
-		// server's first 'Password:' prompt arrives before the addon attaches
-		// and the user has to hit Enter to re-trigger it.
 		setTimeout(function() {
 			console.log("ssh -q -o StrictHostKeyChecking=no netbrain@" + urlParam('RouterName'));
-			ws.send("ssh -q -o StrictHostKeyChecking=no netbrain@" + urlParam('RouterName'));
+			ws.send("ssh -q -o StrictHostKeyChecking=no netbrain@" + urlParam('RouterName') + "\n");
 		}, 100);
 
 
