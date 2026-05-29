@@ -35,24 +35,6 @@
 				<div id="custom-logo">
 				<span style="color: white; font-size: 20px; font-weight: bold; letter-spacing: 2px; padding: 5px 10px;">NB-Lab</span>
 				</div>
-			<div class="level-item">
-				<div class="dropdown is-hoverable is-right">
-				<div class="dropdown-trigger">
-					<button class="button is-small">
-					<i class="icon fas fa-bars" aria-hidden="true"></i>
-					</button>
-				</div>
-				<div class="dropdown-menu" id="dropdown-menu" role="menu">
-					<div class="dropdown-content">
-					<a id="getAllEndpointDetail" href="#" onclick="getActualNodesEndpoints(event);" class="dropdown-item label has-text-weight-normal is-small py-0">Action - Retrieve Actual Endpoint Label</a>     
-					<a id="logMessagesDropdownItem" href="#" onclick="showPanelLogMessages(event);" class="dropdown-item label has-text-weight-normal is-small py-0">Action - Log Messages</a>
-					<!-- Hidden: TopoViewer Helper App
-					<hr class="dropdown-divider py-0">
-					<a id="clabClientDropdownItem" href="#" onclick="showPanelTopoViewerClient();"        class="dropdown-item label has-text-weight-normal is-small py-0">TopoViewer Helper App</a>
-					-->
-					</div>
-				</div>
-				</div>
 			</div>
 		</nav>
 
@@ -73,45 +55,47 @@
 			<div id="viewport-buttons" class="box p-2 is-flex" style="display: block; height: auto;">
 				<div class="is-flex is-flex-direction-column is-justify-content-space-evenly">
 					<p class="control p-0">
-						<a  id="viewport-zoom-to-fit" href="#" onclick="viewportButtonsZoomToFit(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Zoom to Fit">
+						<a id="viewport-zoom-to-fit" href="#" onclick="viewportButtonsZoomToFit(event)" class="button px-3 py-2 is-smallest-element sidebar-btn-with-label" style="outline: none;">
 						<span class="icon is-small">
-						<i class="fas fa-expand"></i> 
+						<i class="fas fa-expand"></i>
+						</span>
+						<span class="sidebar-btn-text">Fit View</span>
+						</a>
+					</p>
+					<p class="control p-0" style="display:none;">
+						<a id="viewport-layout" href="#" onclick="viewportButtonsLayoutAlgo(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Layout Algorithm">
+						<span class="icon is-small">
+						<i class="fas fa-circle-nodes"></i>
 						</span>
 						</a>
 					</p>
-					<p class="control p-0">
-						<a  id="viewport-layout" href="#" onclick="viewportButtonsLayoutAlgo(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Layout Algorithm">
-						<span class="icon is-small">
-						<i class="fas fa-circle-nodes"></i> 
-						</span>
-						</a>
-					</p>
-					<p class="control p-0">
-						<a  id="viewport-topology-overview" href="#" onclick="viewportButtonsTopologyOverview(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Search Node">
+					<p class="control p-0" style="display:none;">
+						<a id="viewport-topology-overview" href="#" onclick="viewportButtonsTopologyOverview(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Search Node">
 						<span class="icon is-small">
 						<i class="fa-solid fa-binoculars"></i>
 						</span>
 						</a>
 					</p>
-					<p class="control p-0">
-						<a  id="viewport-label-endpoint" href="#" onclick="viewportButtonsLabelEndpoint()" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Label Endpoint">
+					<p class="control p-0" style="display:none;">
+						<a id="viewport-label-endpoint" href="#" onclick="viewportButtonsLabelEndpoint()" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Label Endpoint">
 						<span class="icon is-small">
-						<i class="fas fa-tag"></i> 
+						<i class="fas fa-tag"></i>
+						</span>
+						</a>
+					</p>
+					<p class="control p-0" style="display:none;">
+						<a id="viewport-container-status-visibility" href="#" onclick="viewportButtonContainerStatusVisibility()" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Container Status">
+						<span class="icon is-small">
+						<i class="fab fa-docker"></i>
 						</span>
 						</a>
 					</p>
 					<p class="control p-0">
-						<a  id="viewport-container-status-visibility" href="#" onclick="viewportButtonContainerStatusVisibility()" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Container Status">
-						<span class="icon is-small">
-						<i class="fab fa-docker"></i> 
-						</span>
-						</a>
-					</p>
-					<p class="control p-0">
-						<a id="viewport-mgmt-ip" href="#" onclick="viewportButtonsMgmtIP(event)" class="button px-4 py-4 is-smallest-element" style="outline: none;" title="Management IP">
+						<a id="viewport-mgmt-ip" href="#" onclick="viewportButtonsMgmtIP(event)" class="button px-3 py-2 is-smallest-element sidebar-btn-with-label" style="outline: none;">
 						<span class="icon is-small">
 						<i class="fas fa-network-wired"></i>
 						</span>
+						<span class="sidebar-btn-text">Mgmt IPs</span>
 						</a>
 					</p>
 					<!-- Hidden: Topology Capture
@@ -565,8 +549,7 @@
 												</div>
 												<div class="dropdown-menu" id="panel-node-action-dropdown-menu" role="menu">
 													<div class="dropdown-content">
-														<a onclick="sshWebBased(event);"       class="dropdown-item label has-text-weight-normal is-small py-0" id="panel-node-action-ssh-web-based">SSH - Launch Web-Based</a>
-														<a onclick="sshCliCommandCopy(event);" class="dropdown-item label has-text-weight-normal is-small py-0" id="panel-node-action-ssh-copy-cli-command">SSH - Copy to Clipboard</a>
+														<a onclick="sshWebBased(event);"       class="dropdown-item label has-text-weight-normal is-small py-0" id="panel-node-action-ssh-web-based">SSH</a>
 													</div>
 												</div>
 											</div>
