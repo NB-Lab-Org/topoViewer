@@ -66,8 +66,20 @@
 			fitAddon.fit();
 		});
 		setTimeout(function() {
-			console.log("ssh -q -o StrictHostKeyChecking=no netbrain@" + urlParam('RouterName'));
-			ws.send("ssh -q -o StrictHostKeyChecking=no netbrain@" + urlParam('RouterName') + "\n");
+			var routerName = urlParam('RouterName');
+			var nodeKind = urlParam('Kind');
+			var labName = urlParam('LabName');
+			var command;
+			if (nodeKind === "linux" && labName) {
+				// Linux endpoints have no sshd; use docker exec into the
+				// containerlab-managed container. Naming convention is
+				// clab-<labname>-<nodename>.
+				command = "sudo docker exec -it clab-" + labName + "-" + routerName + " sh";
+			} else {
+				command = "ssh -q -o StrictHostKeyChecking=no netbrain@" + routerName;
+			}
+			console.log(command);
+			ws.send(command + "\n");
 		}, 100);
 
 

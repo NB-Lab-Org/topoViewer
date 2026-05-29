@@ -35,24 +35,6 @@
 				<div id="nokia-logo">
 				<img id="nokia-logo-img" src="images/nokia-logo.svg" width="100" hspace="10" vspace="5">
 				</div>
-			<div class="level-item">
-				<div class="dropdown is-hoverable is-right">
-				<div class="dropdown-trigger">
-					<button class="button is-small">
-					<i class="icon fas fa-bars" aria-hidden="true"></i>
-					</button>
-				</div>
-				<div class="dropdown-menu" id="dropdown-menu" role="menu">
-					<div class="dropdown-content">
-					<a id="about" href="#" onclick="showPanelAbout(event);" class="dropdown-item label has-text-weight-normal is-small py-0">About TopoViewer</a>                      
-					<hr class="dropdown-divider py-0">
-					<a id="getAllEndpointDetail" href="#" onclick="getActualNodesEndpoints(event);" class="dropdown-item label has-text-weight-normal is-small py-0">Action - Retrieve Actual Endpoint Label</a>     
-					<a id="logMessagesDropdownItem" href="#" onclick="showPanelLogMessages(event);" class="dropdown-item label has-text-weight-normal is-small py-0">Action - Log Messages</a>       
-					<hr class="dropdown-divider py-0">
-					<a id="clabClientDropdownItem" href="#" onclick="showPanelTopoViewerClient();"        class="dropdown-item label has-text-weight-normal is-small py-0">TopoViewer Helper App</a>                  
-					</div>
-				</div>
-				</div>
 			</div>
 		</nav>
 
@@ -553,8 +535,7 @@
 												</div>
 												<div class="dropdown-menu" id="panel-node-action-dropdown-menu" role="menu">
 													<div class="dropdown-content">
-														<a onclick="sshWebBased(event);"       class="dropdown-item label has-text-weight-normal is-small py-0" id="panel-node-action-ssh-web-based">SSH - Launch Web-Based</a>
-														<a onclick="sshCliCommandCopy(event);" class="dropdown-item label has-text-weight-normal is-small py-0" id="panel-node-action-ssh-copy-cli-command">SSH - Copy to Clipboard</a>
+														<a onclick="sshWebBased(event);"       class="dropdown-item label has-text-weight-normal is-small py-0" id="panel-node-action-ssh-web-based">SSH</a>
 														<hr class="dropdown-divider" />
 														<a onclick="backupRestoreNodeConfig(event);" class="dropdown-item label has-text-weight-normal is-small py-0"> Backup-Restore Config </a>
 														<a href="#" class="dropdown-item label has-text-weight-normal is-small py-0"> Reboot </a>

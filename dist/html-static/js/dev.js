@@ -9,7 +9,7 @@ var globalSelectedNode
 var globalSelectedEdge
 
 var linkEndpointVisibility = true;
-var nodeContainerStatusVisibility = false;
+var nodeContainerStatusVisibility = true;
 var containerStatusReceived = false;
 var topologyHealthState = "checking"; // "checking" | "deployed" | "not-deployed"
 
@@ -1525,13 +1525,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             console.info(`Expanded parallel edges for ${groupId}`);
-            bulmaToast.toast({
-                message: `Expanded parallel edges for ${groupId}`,
-                type: "is-warning is-size-6 p-3",
-                duration: 4000,
-                position: "top-center",
-                closeOnClick: true,
-            });
 
         } else {
             // Collapse parallel edges except the clicked one
@@ -1549,13 +1542,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             console.info(`Collapsed parallel edges for ${groupId}`);
-            bulmaToast.toast({
-                message: `Collapsed parallel edges for ${groupId}`,
-                type: "is-warning is-size-6 p-3",
-                duration: 4000,
-                position: "top-center",
-                closeOnClick: true,
-            });
         }
     }
 
@@ -2040,68 +2026,22 @@ async function sshWebBased(event) {
         cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
         routerData = findCytoElementByLongname(cytoTopologyJson, routerName)
 
-        console.info("sshWebBased: ", `${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`)
+        // Pass kind + lab name so the cloudshell can pick the right
+        // access method: `ssh netbrain@<node>` for network devices,
+        // `docker exec -it clab-<lab>-<node>` for linux endpoints
+        // (no sshd).
+        var nodeKind = routerData["data"]["extraData"]["kind"] || ""
+        var clabName = environments["clab-name"] || ""
+        var shellUrl = `${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}&RouterName=${encodeURIComponent(routerName)}&Kind=${encodeURIComponent(nodeKind)}&LabName=${encodeURIComponent(clabName)}`
 
-        window.open(`${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}?RouterName=${routerName}`);
-
-    } catch (error) {
-        console.error('Error executing restore configuration:', error);
-    }
-}
-
-async function sshCliCommandCopy(event) {
-    console.info("sshWebBased: ", globalSelectedNode)
-    var routerName = globalSelectedNode
-    try {
-        environments = await getEnvironments(event);
-        console.info("sshWebBased - environments: ", environments)
-
-        cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
-        clabServerAddress = environments["clab-server-address"]
-        routerData = findCytoElementByLongname(cytoTopologyJson, routerName)
-        clabUser = routerData["data"]["extraData"]["clabServerUsername"]
-
-        sshCopyString = `ssh -t ${clabUser}@${clabServerAddress} "ssh netbrain@${routerName}"`
-
-        // Check if the clipboard API is available
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(sshCopyString).then(function () {
-                bulmaToast.toast({
-                    message: `Hey there, text cpied to clipboard. 😎`,
-                    type: "is-warning is-size-6 p-3",
-                    duration: 4000,
-                    position: "top-center",
-                    closeOnClick: true,
-                });
-            }).catch(function (error) {
-                console.error('Could not copy text: ', error);
-            });
-        } else {
-            // Fallback method for older browsers
-            let textArea = document.createElement('textarea');
-            textArea.value = sshCopyString;
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                bulmaToast.toast({
-                    message: `Hey there, text cpied to clipboard. 😎`,
-                    type: "is-warning is-size-6 p-3",
-                    duration: 4000,
-                    position: "top-center",
-                    closeOnClick: true,
-                });
-            } catch (err) {
-                console.error('Fallback: Oops, unable to copy', err);
-            }
-            document.body.removeChild(textArea);
-        }
+        console.info("sshWebBased: ", shellUrl)
+        window.open(shellUrl);
 
     } catch (error) {
         console.error('Error executing restore configuration:', error);
     }
 }
+
 
 
 async function linkImpairmentClab(event, impairDirection) {
@@ -2281,13 +2221,6 @@ async function linkWireshark(event, option, endpoint, referenceElementAfterId) {
                 // Check if the clipboard API is available
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(wiresharkSshCommand).then(function () {
-                        bulmaToast.toast({
-                            message: `Hey, now you can paste the link to your terminal console. 😎`,
-                            type: "is-warning is-size-6 p-3",
-                            duration: 4000,
-                            position: "top-center",
-                            closeOnClick: true,
-                        });
                     }).catch(function (error) {
                         console.error('Could not copy text: ', error);
                     });
@@ -2301,13 +2234,6 @@ async function linkWireshark(event, option, endpoint, referenceElementAfterId) {
                     try {
                         document.execCommand('copy');
                         // alert('Text copied to clipboard');
-                        bulmaToast.toast({
-                            message: `Hey, now you can paste the link to your terminal console. 😎`,
-                            type: "is-warning is-size-6 p-3",
-                            duration: 4000,
-                            position: "top-center",
-                            closeOnClick: true,
-                        });
                     } catch (err) {
                         console.error('Fallback: Oops, unable to copy', err);
                     }
@@ -2324,13 +2250,6 @@ async function linkWireshark(event, option, endpoint, referenceElementAfterId) {
                 // Check if the clipboard API is available
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(wiresharkSshCommand).then(function () {
-                        bulmaToast.toast({
-                            message: `Hey, now you can paste the link to your terminal console. 😎`,
-                            type: "is-warning is-size-6 p-3",
-                            duration: 4000,
-                            position: "top-center",
-                            closeOnClick: true,
-                        });
                     }).catch(function (error) {
                         console.error('Could not copy text: ', error);
                     });
@@ -2344,13 +2263,6 @@ async function linkWireshark(event, option, endpoint, referenceElementAfterId) {
                     try {
                         document.execCommand('copy');
                         // alert('Text copied to clipboard');
-                        bulmaToast.toast({
-                            message: `Hey, now you can paste the link to your terminal console. 😎`,
-                            type: "is-warning is-size-6 p-3",
-                            duration: 4000,
-                            position: "top-center",
-                            closeOnClick: true,
-                        });
                     } catch (err) {
                         console.error('Fallback: Oops, unable to copy', err);
                     }
@@ -2379,13 +2291,6 @@ async function linkWireshark(event, option, endpoint, referenceElementAfterId) {
             // Check if the clipboard API is available
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(wiresharkSshCommand).then(function () {
-                    bulmaToast.toast({
-                        message: `Hey, now you can paste the link to your terminal console. 😎`,
-                        type: "is-warning is-size-6 p-3",
-                        duration: 4000,
-                        position: "top-center",
-                        closeOnClick: true,
-                    });
                 }).catch(function (error) {
                     console.error('Could not copy text: ', error);
                 });
@@ -2399,13 +2304,6 @@ async function linkWireshark(event, option, endpoint, referenceElementAfterId) {
                 try {
                     document.execCommand('copy');
                     // alert('Text copied to clipboard');
-                    bulmaToast.toast({
-                        message: `Hey, now you can paste the link to your terminal console. 😎`,
-                        type: "is-warning is-size-6 p-3",
-                        duration: 4000,
-                        position: "top-center",
-                        closeOnClick: true,
-                    });
                 } catch (err) {
                     console.error('Fallback: Oops, unable to copy', err);
                 }
@@ -2540,13 +2438,6 @@ async function showPanelAbout(event) {
 
 async function getActualNodesEndpoints(event) {
     try {
-        bulmaToast.toast({
-            message: `Getting Actual Nodes Endpoint Labels... Hold on..! 🚀💻`,
-            type: "is-warning is-size-6 p-3",
-            duration: 4000,
-            position: "top-center",
-            closeOnClick: true,
-        });
         appendMessage(
             `Getting Actual Nodes Endpoint Labels... Hold on..! 🚀💻`,
         );
@@ -2818,13 +2709,6 @@ function viewportButtonContainerStatusVisibility() {
         appendMessage(
             "nodeContainerStatusVisibility: " + nodeContainerStatusVisibility,
         );
-        bulmaToast.toast({
-            message: `Alright, mission control, we're standing down. 🛑🔍 Container status probing aborted. Stay chill, folks. 😎👨‍💻`,
-            type: "is-warning is-size-6 p-3",
-            duration: 4000,
-            position: "top-center",
-            closeOnClick: true,
-        });
     } else {
         nodeContainerStatusVisibility = true;
         console.info(
@@ -2833,13 +2717,6 @@ function viewportButtonContainerStatusVisibility() {
         appendMessage(
             "nodeContainerStatusVisibility: " + nodeContainerStatusVisibility,
         );
-        bulmaToast.toast({
-            message: `🕵️‍♂️ Bro, we're currently on a mission to probe that container status! Stay tuned for the results. 🔍🚀👨‍💻`,
-            type: "is-warning is-size-6 p-3",
-            duration: 4000,
-            position: "top-center",
-            closeOnClick: true,
-        });
     }
 }
 
@@ -3333,13 +3210,6 @@ async function captureAndSaveViewportAsDrawIo(cy) {
     a.download = "filename.drawio";
     document.body.appendChild(a);
 
-    bulmaToast.toast({
-        message: `Brace yourselves for a quick snapshot, folks! 📸 Capturing the viewport in 3... 2... 1... 🚀💥`,
-        type: "is-warning is-size-6 p-3",
-        duration: 2000,
-        position: "top-center",
-        closeOnClick: true,
-    });
     await sleep(2000);
 
     // Simulate a click to trigger the download
@@ -4682,13 +4552,6 @@ function copyMgmtIPs() {
         if (cells[2]) ips.push(cells[2].textContent);
     });
     navigator.clipboard.writeText(ips.join(",")).then(function () {
-        bulmaToast.toast({
-            message: "Management IPs copied to clipboard",
-            type: "is-success is-size-6 p-3",
-            duration: 3000,
-            position: "top-center",
-            closeOnClick: true,
-        });
     });
 }
 

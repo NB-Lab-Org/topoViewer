@@ -207,6 +207,7 @@ body {
   left: 40px;
   position: fixed;
   z-index: 9;
+  min-width: 120px;
 }
 
 .viewport-drawer {
@@ -238,6 +239,19 @@ body {
   font-size: 11px;
   padding: 0px 8px;
   height: 24px;
+}
+
+/* Sidebar buttons with icon + text label (icon-left, text-right) */
+.sidebar-btn-with-label {
+  justify-content: flex-start !important;
+  width: 100%;
+  height: 30px !important;
+  font-size: 12px !important;
+}
+.sidebar-btn-with-label .sidebar-btn-text {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .vertical-align-top {
