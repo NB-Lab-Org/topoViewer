@@ -207,15 +207,15 @@ body {
   left: 16px;
   position: fixed;
   z-index: 9;
-  min-width: 150px;
+  min-width: 140px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
-  padding: 8px !important;
+  padding: 6px !important;
 }
 
 #viewport-buttons .control {
-  margin-bottom: 6px;
+  margin-bottom: 2px;
 }
 
 #viewport-buttons .control:last-child {
@@ -253,29 +253,32 @@ body {
   height: 24px;
 }
 
-/* Sidebar buttons with icon + text label (icon-left, text-right) */
+/* Sidebar buttons with icon + text label (icon-left, text-right).
+   Buttons are borderless rows inside the #viewport-buttons card — only
+   the outer card has visible chrome, so the row hover is the only
+   per-button affordance. */
 .sidebar-btn-with-label {
   justify-content: flex-start !important;
   width: 100%;
-  height: 36px !important;
+  height: 32px !important;
   font-size: 13px !important;
-  border: 1px solid #e0e0e0 !important;
-  border-radius: 6px !important;
-  background: #fafafa !important;
+  border: none !important;
+  border-radius: 4px !important;
+  background: transparent !important;
   color: #2c3e50 !important;
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease !important;
-  padding: 0 12px !important;
+  transition: background 0.15s ease, color 0.15s ease !important;
+  padding: 0 10px !important;
+  box-shadow: none !important;
 }
 .sidebar-btn-with-label:hover {
-  background: #f0f4f8 !important;
-  border-color: #4a90e2 !important;
+  background: #eef4fb !important;
   color: #1a5490 !important;
-}
-.sidebar-btn-with-label:active {
-  transform: scale(0.97);
 }
 .sidebar-btn-with-label .icon {
   color: #4a90e2;
+}
+.sidebar-btn-with-label:hover .icon {
+  color: #1a5490;
 }
 .sidebar-btn-with-label .sidebar-btn-text {
   margin-left: 10px;
