@@ -204,10 +204,22 @@ body {
 
 #viewport-buttons {
   top: 75px;
-  left: 40px;
+  left: 16px;
   position: fixed;
   z-index: 9;
-  min-width: 120px;
+  min-width: 150px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  padding: 8px !important;
+}
+
+#viewport-buttons .control {
+  margin-bottom: 6px;
+}
+
+#viewport-buttons .control:last-child {
+  margin-bottom: 0;
 }
 
 .viewport-drawer {
@@ -245,13 +257,42 @@ body {
 .sidebar-btn-with-label {
   justify-content: flex-start !important;
   width: 100%;
-  height: 30px !important;
-  font-size: 12px !important;
+  height: 36px !important;
+  font-size: 13px !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 6px !important;
+  background: #fafafa !important;
+  color: #2c3e50 !important;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease !important;
+  padding: 0 12px !important;
+}
+.sidebar-btn-with-label:hover {
+  background: #f0f4f8 !important;
+  border-color: #4a90e2 !important;
+  color: #1a5490 !important;
+}
+.sidebar-btn-with-label:active {
+  transform: scale(0.97);
+}
+.sidebar-btn-with-label .icon {
+  color: #4a90e2;
 }
 .sidebar-btn-with-label .sidebar-btn-text {
-  margin-left: 8px;
-  font-size: 12px;
+  margin-left: 10px;
+  font-size: 13px;
   font-weight: 500;
+}
+
+/* Direct SSH button in the node properties panel (replaces the old
+   "Actions ▾" dropdown that wrapped a single SSH item). */
+.panel-ssh-button {
+  height: 28px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  padding: 0 14px !important;
+}
+.panel-ssh-button .icon {
+  margin-right: 4px;
 }
 
 .vertical-align-top {
