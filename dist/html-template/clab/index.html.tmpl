@@ -7,7 +7,7 @@
 		<link rel="stylesheet" href="js/library/bulma-1-0-0.min.css?ver=1">
 		
 
-		<link rel="stylesheet" href="css/style.css?ver=1" />
+		<link rel="stylesheet" href="css/style.css?ver=2" />
 
 		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 		<link rel="stylesheet" href="css/cytoscape-leaflet.css?ver=1" /> 
@@ -538,21 +538,12 @@
 									<div class="columns py-auto" >
 										<div  class="column is-4 p-1"><label class="label is-size-7 has-text-right has-text-weight-medium px-auto" ></label></div>
 										<div class="column is-8 p-1 pl-3" >
-											<div class="dropdown is-hoverable">
-												<div class="dropdown-trigger">
-													<button class="button label has-text-weight-normal is-small py-0" aria-haspopup="true" aria-controls="dropdown-menu">
-													<span>Actions</span>
-													<span class="icon is-small">
-													<i class="fas fa-angle-down" aria-hidden="true"></i>
-													</span>
-													</button>
-												</div>
-												<div class="dropdown-menu" id="panel-node-action-dropdown-menu" role="menu">
-													<div class="dropdown-content">
-														<a onclick="sshWebBased(event);"       class="dropdown-item label has-text-weight-normal is-small py-0" id="panel-node-action-ssh-web-based">SSH</a>
-													</div>
-												</div>
-											</div>
+											<button onclick="sshWebBased(event);" class="button is-link is-small panel-ssh-button" id="panel-node-action-ssh-web-based">
+												<span class="icon is-small">
+													<i class="fas fa-terminal" aria-hidden="true"></i>
+												</span>
+												<span>Terminal</span>
+											</button>
 										</div>
 									</div>
 								</div>
@@ -1192,7 +1183,7 @@
 			
 			
 
-			<script src="js/dev.js?ver=10"></script>
+			<script src="js/dev.js?ver=11"></script>
 			
 			<script src="/js/backupRestore.js?ver=1"></script>
 			<script src="/js/managerClabEditor.js?ver=1"></script>
