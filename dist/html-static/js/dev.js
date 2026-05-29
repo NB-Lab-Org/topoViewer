@@ -2026,13 +2026,11 @@ async function sshWebBased(event) {
         cytoTopologyJson = environments["EnvCyTopoJsonBytes"]
         routerData = findCytoElementByLongname(cytoTopologyJson, routerName)
 
-        // Pass kind + lab name so the cloudshell can pick the right
-        // access method: `ssh netbrain@<node>` for network devices,
-        // `docker exec -it clab-<lab>-<node>` for linux endpoints
-        // (no sshd).
+        // Pass kind so the cloudshell can pick the right access method:
+        // `ssh netbrain@<node>` for network devices, `docker exec` for
+        // linux endpoints (no sshd).
         var nodeKind = routerData["data"]["extraData"]["kind"] || ""
-        var clabName = environments["clab-name"] || ""
-        var shellUrl = `${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}&RouterName=${encodeURIComponent(routerName)}&Kind=${encodeURIComponent(nodeKind)}&LabName=${encodeURIComponent(clabName)}`
+        var shellUrl = `${globalShellUrl}?RouterID=${routerData["data"]["extraData"]["mgmtIpv4Addresss"]}&RouterName=${encodeURIComponent(routerName)}&Kind=${encodeURIComponent(nodeKind)}`
 
         console.info("sshWebBased: ", shellUrl)
         window.open(shellUrl);

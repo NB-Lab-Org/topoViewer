@@ -9,14 +9,9 @@
 
 	// Retrieve the RouterID query parameter
 	var routerId = urlParam('RouterID');
-	
 	console.log("routerId:", routerId);
 
-	// Process the routerId string
-	var split1 = routerId.toString().split("?");
-	console.log(split1[1].split("=")[1])
-
-	document.title = `TopoViewer::${split1[1].split("=")[1]}`;
+	document.title = `TopoViewer::${urlParam('RouterName')}`;
 
 
 	// Initialize the terminal with the desired options
@@ -68,13 +63,13 @@
 		setTimeout(function() {
 			var routerName = urlParam('RouterName');
 			var nodeKind = urlParam('Kind');
-			var labName = urlParam('LabName');
 			var command;
-			if (nodeKind === "linux" && labName) {
+			if (nodeKind === "linux") {
 				// Linux endpoints have no sshd; use docker exec into the
-				// containerlab-managed container. Naming convention is
-				// clab-<labname>-<nodename>.
-				command = "sudo docker exec -it clab-" + labName + "-" + routerName + " sh";
+				// containerlab-managed container. RouterName is already
+				// the long container name (clab-<lab>-<node>) since the
+				// frontend reads it from the node's `longname` field.
+				command = "docker exec -it " + routerName + " sh";
 			} else {
 				command = "ssh -q -o StrictHostKeyChecking=no netbrain@" + routerName;
 			}
