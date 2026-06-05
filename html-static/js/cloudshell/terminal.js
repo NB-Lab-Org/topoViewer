@@ -70,6 +70,13 @@
 				// the long container name (clab-<lab>-<node>) since the
 				// frontend reads it from the node's `longname` field.
 				command = "docker exec -it " + routerName + " sh";
+			} else if (nodeKind === "paloalto_panos") {
+				// PAN-OS can't take the shared `netbrain` SSH user that
+				// validate_netbrain_discovery provisions on other vendors
+				// (it only sets the SNMP community there). Log in as the
+				// built-in admin instead — the user types the Admin@123
+				// password at the interactive prompt.
+				command = "ssh -q -o StrictHostKeyChecking=no admin@" + routerName;
 			} else {
 				command = "ssh -q -o StrictHostKeyChecking=no netbrain@" + routerName;
 			}
