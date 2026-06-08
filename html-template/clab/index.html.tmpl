@@ -1074,7 +1074,7 @@
 			<!-- Management IP Modal -->
 			<div class="modal" id="mgmt-ip-modal">
 				<div class="modal-background" onclick="closePanelMgmtIP()"></div>
-				<div class="modal-card" style="max-width: 520px;">
+				<div class="modal-card" style="max-width: 760px;">
 					<header class="modal-card-head py-2">
 						<p class="modal-card-title is-size-6">Management IP Addresses</p>
 						<button class="delete" aria-label="close" onclick="closePanelMgmtIP()"></button>
@@ -1083,9 +1083,14 @@
 						<table class="table is-fullwidth is-hoverable is-size-7" id="mgmt-ip-table">
 							<thead>
 								<tr>
+									<th><input type="checkbox" id="mgmt-ip-select-all" checked onclick="toggleAllMgmtIP(this)"></th>
 									<th>Device</th>
+									<th>Vendor</th>
 									<th>Platform</th>
 									<th>Management IPv4</th>
+									<th>SSH User</th>
+									<th>SSH Pass</th>
+									<th>SNMP</th>
 								</tr>
 							</thead>
 							<tbody id="mgmt-ip-table-body">

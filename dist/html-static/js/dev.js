@@ -4503,19 +4503,97 @@ if (isVscodeDeployment) {
 }
 
 // Management IP modal functions
+
+// Map a containerlab `kind` to a human-friendly vendor name. Handles the
+// kinds this platform actually deploys plus a prefix fallback for the
+// broader containerlab family; unknown kinds fall back to the raw string.
+function mgmtKindToVendor(kind) {
+    if (!kind) return "";
+    var k = String(kind).toLowerCase().replace(/^vr-/, "");
+    var exact = {
+        cisco_iol: "Cisco",
+        arista_ceos: "Arista",
+        nokia_srlinux: "Nokia",
+        juniper_crpd: "Juniper",
+        paloalto_panos: "Palo Alto",
+        fortinet_fortigate: "Fortinet",
+        vyos: "VyOS",
+        linux: "Linux",
+    };
+    if (exact[k]) return exact[k];
+    var prefixes = [
+        ["cisco", "Cisco"], ["arista", "Arista"], ["nokia", "Nokia"],
+        ["juniper", "Juniper"], ["paloalto", "Palo Alto"], ["pan", "Palo Alto"],
+        ["fortinet", "Fortinet"], ["vyos", "VyOS"], ["mikrotik", "MikroTik"],
+        ["dell", "Dell"], ["aruba", "Aruba"], ["huawei", "Huawei"],
+        ["cumulus", "Cumulus"], ["sonic", "SONiC"], ["checkpoint", "Check Point"],
+    ];
+    for (var i = 0; i < prefixes.length; i++) {
+        if (k.indexOf(prefixes[i][0]) === 0) return prefixes[i][1];
+    }
+    return kind;
+}
+
+// Per-kind management credentials. Mirrors what validate_netbrain_discovery
+// provisions on each device:
+//   - linux endpoints: no sshd, excluded from netbrain discovery → "—"
+//   - PAN-OS: can't take the shared `netbrain` SSH user (only SNMP), so
+//     login is the built-in admin / Admin@123
+//   - all other network devices: netbrain / netbrain, snmp community netbrain
+function mgmtKindCreds(kind) {
+    var k = String(kind || "").toLowerCase().replace(/^vr-/, "");
+    if (k === "linux") {
+        return { sshUser: "—", sshPass: "—", snmp: "—" };
+    }
+    if (k === "paloalto_panos" || k === "pan") {
+        return { sshUser: "admin", sshPass: "Admin@123", snmp: "netbrain" };
+    }
+    return { sshUser: "netbrain", sshPass: "netbrain", snmp: "netbrain" };
+}
+
+// Bulk select/deselect from the table header checkbox.
+function toggleAllMgmtIP(headerCheckbox) {
+    var boxes = document.querySelectorAll("#mgmt-ip-table-body input.mgmt-ip-select");
+    boxes.forEach(function (cb) { cb.checked = headerCheckbox.checked; });
+}
+
 function viewportButtonsMgmtIP() {
     // Extract management IPs from Cytoscape node data
     var tbody = document.getElementById("mgmt-ip-table-body");
     tbody.innerHTML = "";
+    var total = 0;
+    var checkedCount = 0;
     cy.nodes().forEach(function (node) {
         var extraData = node.data("extraData");
         if (extraData && extraData.mgmtIpv4Addresss) {
+            var kind = extraData.kind || "";
+            var isLinux = String(kind).toLowerCase() === "linux";
+            var creds = mgmtKindCreds(kind);
             var row = tbody.insertRow();
-            row.insertCell(0).textContent = node.data("name") || node.data("id");
-            row.insertCell(1).textContent = extraData.kind || "";
-            row.insertCell(2).textContent = extraData.mgmtIpv4Addresss;
+
+            // Column 0: selection checkbox. Network devices are checked by
+            // default; linux endpoints (no SSH/SNMP) start unchecked.
+            var cb = document.createElement("input");
+            cb.type = "checkbox";
+            cb.className = "mgmt-ip-select";
+            cb.checked = !isLinux;
+            row.insertCell(0).appendChild(cb);
+            total++;
+            if (cb.checked) checkedCount++;
+
+            row.insertCell(1).textContent = node.data("name") || node.data("id");
+            row.insertCell(2).textContent = mgmtKindToVendor(kind);
+            row.insertCell(3).textContent = kind;
+            row.insertCell(4).textContent = extraData.mgmtIpv4Addresss;
+            row.insertCell(5).textContent = creds.sshUser;
+            row.insertCell(6).textContent = creds.sshPass;
+            row.insertCell(7).textContent = creds.snmp;
         }
     });
+
+    // Reflect the rows' default selection in the header "select all" box.
+    var selectAll = document.getElementById("mgmt-ip-select-all");
+    if (selectAll) selectAll.checked = total > 0 && checkedCount === total;
 
     document.getElementById("mgmt-ip-modal").classList.add("is-active");
 }
@@ -4524,14 +4602,29 @@ function closePanelMgmtIP() {
     document.getElementById("mgmt-ip-modal").classList.remove("is-active");
 }
 
-function exportMgmtIPsToCSV() {
-    var csv = "Device,Management IPv4\n";
+// Iterate only the rows whose selection checkbox is checked.
+function forEachSelectedMgmtRow(fn) {
     var rows = document.querySelectorAll("#mgmt-ip-table-body tr");
     rows.forEach(function (row) {
-        var cells = row.querySelectorAll("td");
-        var device = cells[0].textContent;
-        var ip = cells[2].textContent;
-        csv += '"' + device + '","' + ip + '"\n';
+        var cb = row.querySelector("input.mgmt-ip-select");
+        if (cb && !cb.checked) return;
+        fn(row.querySelectorAll("td"));
+    });
+}
+
+function exportMgmtIPsToCSV() {
+    var csv = "Device,Vendor,Platform,Management IPv4,SSH User,SSH Password,SNMP Community\n";
+    forEachSelectedMgmtRow(function (cells) {
+        var vals = [
+            cells[1].textContent, // Device
+            cells[2].textContent, // Vendor
+            cells[3].textContent, // Platform
+            cells[4].textContent, // Management IPv4
+            cells[5].textContent, // SSH User
+            cells[6].textContent, // SSH Password
+            cells[7].textContent, // SNMP Community
+        ];
+        csv += vals.map(function (v) { return '"' + v + '"'; }).join(",") + "\n";
     });
     var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     var link = document.createElement("a");
@@ -4544,12 +4637,10 @@ function exportMgmtIPsToCSV() {
 
 function copyMgmtIPs() {
     var ips = [];
-    var rows = document.querySelectorAll("#mgmt-ip-table-body tr");
-    rows.forEach(function (row) {
-        var cells = row.querySelectorAll("td");
-        if (cells[2]) ips.push(cells[2].textContent);
+    forEachSelectedMgmtRow(function (cells) {
+        if (cells[4]) ips.push(cells[4].textContent);
     });
-    navigator.clipboard.writeText(ips.join(",")).then(function () {
+    navigator.clipboard.writeText(ips.join(";")).then(function () {
     });
 }
 
