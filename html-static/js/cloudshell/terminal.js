@@ -63,6 +63,10 @@
 		setTimeout(function() {
 			var routerName = urlParam('RouterName');
 			var nodeKind = urlParam('Kind');
+			// Normalize the vrnetlab "vr-" prefix so vr-paloalto_panos /
+			// vr-pan resolve the same as paloalto_panos — matches the
+			// management-IP table's credential mapping in dev.js.
+			var baseKind = String(nodeKind).replace(/^vr-/, "");
 			var command;
 			if (nodeKind === "linux") {
 				// Linux endpoints have no sshd; use docker exec into the
@@ -70,7 +74,7 @@
 				// the long container name (clab-<lab>-<node>) since the
 				// frontend reads it from the node's `longname` field.
 				command = "docker exec -it " + routerName + " sh";
-			} else if (nodeKind === "paloalto_panos") {
+			} else if (baseKind === "paloalto_panos" || baseKind === "pan") {
 				// PAN-OS can't take the shared `netbrain` SSH user that
 				// validate_netbrain_discovery provisions on other vendors
 				// (it only sets the SNMP community there). Log in as the
