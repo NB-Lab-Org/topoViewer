@@ -4548,6 +4548,13 @@ function mgmtKindCreds(kind) {
     if (k === "paloalto_panos" || k === "pan") {
         return { sshUser: "admin", sshPass: "Admin@123", snmp: "netbrain" };
     }
+    if (k === "juniper_crpd" || k === "crpd") {
+        // cRPD is NOT provisioned by validate_netbrain_discovery (unsupported
+        // vendor), so it has no `netbrain` login or SNMP community. Access is
+        // the container's root user with the startup-config password (clab123,
+        // per the Juniper cRPD skill); SNMP is not configured.
+        return { sshUser: "root", sshPass: "clab123", snmp: "—" };
+    }
     return { sshUser: "netbrain", sshPass: "netbrain", snmp: "netbrain" };
 }
 

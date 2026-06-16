@@ -81,6 +81,12 @@
 				// built-in admin instead — the user types the Admin@123
 				// password at the interactive prompt.
 				command = "ssh -q -o StrictHostKeyChecking=no admin@" + routerName;
+			} else if (baseKind === "juniper_crpd" || baseKind === "crpd") {
+				// cRPD is not provisioned by validate_netbrain_discovery, so the
+				// shared `netbrain` user doesn't exist here. Log in as the
+				// container's root user (startup-config password clab123); root
+				// lands in a bash shell — run `cli` to reach the Junos CLI.
+				command = "ssh -q -o StrictHostKeyChecking=no root@" + routerName;
 			} else {
 				command = "ssh -q -o StrictHostKeyChecking=no netbrain@" + routerName;
 			}
